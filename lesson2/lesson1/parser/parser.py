@@ -1,8 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
-import pandas
+import logging
 import data_client
+import re
+from concurrent.futures import ThreadPoolExecutor
 
+logging.basicConfig(level=logging.INFO)
 
 class Parser:
     links_to_parse = [
@@ -15,34 +18,51 @@ class Parser:
 
     @staticmethod
     def get_mebel_by_link(link):
-        response = requests.get(link)
-        mebel_data = response.text
+        try:
+            response = requests.get(link)
+            response.raise_for_status()
+            mebel_data = response.text
 
-        mebel_items = []
-        to_parse = BeautifulSoup(mebel_data, 'html.parser')
-        for elem in to_parse.find_all('a', class_='styles_wrapper__5FoK7'):
-            try:
-                price, description = elem.text.split('р.')
-                mebel_items.append((
-                    elem['href'],
-                    int(price.replace(' ', '')),
-                    description
-                ))
-            except:
-                print(f'Цена не была указана. {elem.text}')
+            mebel_items = []
+            to_parse = BeautifulSoup(mebel_data, 'html.parser')
+            for elem in to_parse.find_all('a', class_='styles_wrapper__5FoK7'):
+                try:
+                    # Используем регулярное выражение для извлечения цены и описания
+                    match = re.search(r'(\d[\d\s]*)\s*р\.\s*(.*)', elem.text)
+                    if match:
+                        price = int(match.group(1).replace(' ', ''))
+                        description = match.group(2).strip()
+                        mebel_items.append((
+                            elem['href'],
+                            price,
+                            description
+                        ))
+                    else:
+                        logging.warning(f'Не удалось извлечь цену и описание: {elem.text}')
+                except Exception as e:
+                    logging.error(f'Ошибка при обработке элемента: {e}')
 
-        return mebel_items
+            return mebel_items
+        except requests.RequestException as e:
+            logging.error(f"Ошибка при запросе к {link}: {e}")
+            return []
 
     def save_to_postgres(self, mebel_items):
-        self.data_client_imp.create_mebel_table()
-        for item in mebel_items:
-            self.data_client_imp.insert(item[0], item[1], item[2])
+        try:
+            self.data_client_imp.create_mebel_table()
+            with self.data_client_imp as client:
+                for item in mebel_items:
+                    client.insert(item[0], item[1], item[2])
+        except Exception as e:
+            logging.error(f"Ошибка при сохранении данных в базу данных: {e}")
 
     def run(self):
         mebel_items = []
-        for link in Parser.links_to_parse:
-            mebel_items.extend(self.get_mebel_by_link(link))
+        with ThreadPoolExecutor() as executor:
+            results = list(executor.map(self.get_mebel_by_link, Parser.links_to_parse))
+            for result in results:
+                mebel_items.extend(result)
         self.save_to_postgres(mebel_items)
 
-
-Parser().run()
+if __name__ == "__main__":
+    Parser().run()
