@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import logging
-import data_client1
+import data_client
 import re
 from concurrent.futures import ThreadPoolExecutor
 
@@ -14,7 +14,7 @@ class Parser:
         'https://www.kufar.by/l/mebel?cursor=eyJ0IjoiYWJzIiwiZiI6dHJ1ZSwicCI6M30%3D',
         'https://www.kufar.by/l/mebel?cursor=eyJ0IjoiYWJzIiwiZiI6dHJ1ZSwicCI6NH0%3D'
     ]
-    data_client_imp = data_client1.PostgresClient()
+    data_client_imp = data_client.PostgresClient()
 
     @staticmethod
     def get_mebel_by_link(link):
