@@ -22,11 +22,11 @@ class Parser:
         to_parse = BeautifulSoup(mebel_data, 'html.parser')
         for elem in to_parse.find_all('a', class_='styles_wrapper__5FoK7'):
             try:
-                price, decription = elem.text.split('р.')
+                price, description = elem.text.split('р.')
                 mebel_items.append((
                     elem['href'],
                     int(price.replace(' ', '')),
-                    decription
+                    description
                 ))
             except:
                 print(f'Цена не была указана. {elem.text}')
@@ -36,7 +36,7 @@ class Parser:
     def save_to_postgres(self, mebel_items):
         self.data_client_imp.create_mebel_table()
         for item in mebel_items:
-            self. data_client_imp.insert(item[0], item[1], item[2])
+            self.data_client_imp.insert(item[0], item[1], item[2])
 
     def run(self):
         mebel_items = []
