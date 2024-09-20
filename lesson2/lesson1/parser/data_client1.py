@@ -16,7 +16,7 @@ class PostgresClient:
                 password = "postgres",
                 host = "localhost",
                 port = "5433",
-                client_encoding='utf8'
+                client_encoding='utf8' # Устанавливаем кодировку UTF-8
             )
             self.cursor = self.connection.cursor()
         except psycopg2.Error as e:
