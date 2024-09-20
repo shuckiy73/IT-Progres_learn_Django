@@ -12,9 +12,9 @@ class PostgresClient:
         try:
             self.connection = psycopg2.connect(
                 DBname="app_1_mebel",
-                USER = "postgres"
-                PASSWORD = "postgres"
-                HOST = "localhost"
+                USER = "postgres",
+                PASSWORD = "postgres",
+                HOST = "localhost",
                 PORT = "5433"
             )
             self.cursor = self.connection.cursor()
