@@ -15,7 +15,8 @@ class PostgresClient:
                 user = "postgres",
                 password = "postgres",
                 host = "localhost",
-                port = "5433"
+                port = "5433",
+                client_encoding='utf8'
             )
             self.cursor = self.connection.cursor()
         except psycopg2.Error as e:
