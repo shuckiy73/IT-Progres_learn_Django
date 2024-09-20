@@ -11,7 +11,7 @@ class PostgresClient:
     def connect(self):
         try:
             self.connection = psycopg2.connect(
-                DBNAME="app_1_mebel",
+                dbname="app_1_mebel",
                 USER = "postgres",
                 PASSWORD = "postgres",
                 HOST = "localhost",
