@@ -20,7 +20,7 @@ class Parser:
 
         mebel_items = []
         to_parse = BeautifulSoup(mebel_data, 'html.parser')
-        for elem in to_parse.find_all('a', class_='styles_wrapper__yaLfq'):
+        for elem in to_parse.find_all('a', class_='styles_wrapper__5FoK7'):
             try:
                 price, decription = elem.text.split('р.')
                 mebel_items.append((
