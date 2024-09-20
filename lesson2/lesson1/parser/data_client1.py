@@ -12,10 +12,10 @@ class PostgresClient:
         try:
             self.connection = psycopg2.connect(
                 dbname="app_1_mebel",
-                USER = "postgres",
-                PASSWORD = "postgres",
-                HOST = "localhost",
-                PORT = "5433"
+                user = "postgres",
+                password = "postgres",
+                host = "localhost",
+                port = "5433"
             )
             self.cursor = self.connection.cursor()
         except psycopg2.Error as e:
